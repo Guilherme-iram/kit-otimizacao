@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <vector>
 
@@ -12,6 +13,8 @@ namespace ILS
 
             void print();
             void calculaFO();
+            Solution();
+            Solution(double** matrizDistancias);
             Solution(double** matrizDistancias, std::vector<int> clients);
     };
 }

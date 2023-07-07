@@ -26,6 +26,18 @@ void Solution::calculaFO()
     }
 }
 
+Solution::Solution ()
+{
+    this->sequencia = {1, 1};
+    this->custoSolucao = 0;0;
+}
+
 Solution::Solution (double** matrizDistancias, std::vector<int> clients): sequencia(clients), matrizDistancias(matrizDistancias)
 {
+}
+
+Solution::Solution (double** matrizDistancias): matrizDistancias(matrizDistancias)
+{
+    this->sequencia = {1, 1};
+    this->custoSolucao = 0.0;
 }

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "readData.h"
 #include "Solution.h"
-
+#include "ILS.h"
 
 using namespace std;
 using namespace ILS;
@@ -13,21 +13,8 @@ int main(int argc, char* argv[]) {
 
     readData(argc, argv, &dim, &matrizAdj);
 
-    cout << "Dimensao: " << dim << endl;
-    cout << "-----------" << endl;
-    cout << "Matriz de adjacencia: " << endl;
-
-    for(int i = 1; i < dim; i++) {
-        for(int j = 1; j < dim; j++) {
-            cout << matrizAdj[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-    vector<int> auxClientss = {1, 16, 1};
-    Solution solucao = Solution(matrizAdj, auxClientss);
-    solucao.calculaFO();
-    solucao.print();
+    Solver solve = Solver();
+    Solution s = solve.Construction(matrizAdj, &dim);
 
     return 0;    
 }

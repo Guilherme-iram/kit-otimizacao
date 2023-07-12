@@ -11,6 +11,7 @@ using namespace ILS;
 
 std::vector<InsertionInfo> Solver::calcularCustoInsercao(Solution& s, std::vector<int>& CL)
 {
+
     std::vector<InsertionInfo> custoInsercao = std::vector<InsertionInfo>((s.sequencia.size() - 1) * CL.size());
     int l = 0;
     
@@ -25,52 +26,63 @@ std::vector<InsertionInfo> Solver::calcularCustoInsercao(Solution& s, std::vecto
             custoInsercao[l].deltaCusto = s.matrizDistancias[i][k] + s.matrizDistancias[j][k] - s.matrizDistancias[i][j];
             custoInsercao[l].noInserido = k;
             custoInsercao[l].arestaRemovida = a;
-            l++;
+            l++;   
         }
     }
 
     return custoInsercao;
 }
 
+bool compare(const InsertionInfo& a, const InsertionInfo& b)
+{
+    return a.deltaCusto < b.deltaCusto;
+}
+
 Solution Solver::Construction(double** matrizAdj, int* dim)
 {
     srand(time(0));
-    Solution s = Solution();
-
-    std::vector<int> sequencia = {1, 1};
-    std::vector<int> clients = std::vector<int>(*dim - 2);
     
-    for (int i = 2; i < *dim; i++)
+    Solution s = Solution(matrizAdj);
+
+    std::vector<int> clients;
+
+    s.sequencia.push_back(1);
+
+    for (int i = 2; i <= (*dim); i++)
     {   
-        clients[i - 2] = i;
-    }
-    
-    int random_index;
-    int size_clients = clients.size();
-    
-    // Escolha aleatoria de 3 cidades para visita
-    for (int i = 0; i < 3; i++)
-    {
-        random_index = rand() % size_clients;
-        sequencia.insert(sequencia.begin() + (i + 1), clients[random_index]);
-        clients.erase(clients.begin() + random_index--);
+        clients.push_back(i);
     }
 
-    std::cout << "Sequencia inicial: " << std::endl;
+    random_shuffle(clients.begin(), clients.end());
+
     for (int i = 0; i < 2; i++)
     {
-        std::cout << sequencia[i] << " -> ";
+        // adiciona o cliente na sequencia 
+        s.sequencia.push_back(clients[i]);
+
+        // remove o cliente da lista de clientes
+        clients.erase(std::find(clients.begin(), clients.end(), clients[i]));
     }
-    std::cout << sequencia[2] << std::endl;
+    
+    s.sequencia.push_back(1);
+    // Escolha aleatoria de 3 cidades para visita
+
+    std::cout << "Sequencia inicial: " << std::endl;
+    for (int i = 0; i < s.sequencia.size() - 1; i++)
+    {
+        std::cout << s.sequencia[i] << " -> ";
+    }
+    std::cout << " 1 " << std::endl;
+    
+    int cont = 0;
     
     while(!clients.empty()) 
     {
-        std::vector<InsertionInfo> custoInsercao = calcularCustoInsercao(s, clients);
 
+        std::vector<InsertionInfo> custoInsercao = calcularCustoInsercao(s, clients);
         //  ordena do menor para o maior delta custo (nao crescente)
-        std::sort(custoInsercao.begin(), custoInsercao.end(), [](const InsertionInfo& a, const InsertionInfo& b) {
-            return a.deltaCusto < b.deltaCusto;
-        });
+
+        std::sort(custoInsercao.begin(), custoInsercao.end(), compare);
 
         // escolhe um alpha aleatorio entre 0 e 1
         // 0 total guloso
@@ -81,15 +93,15 @@ Solution Solver::Construction(double** matrizAdj, int* dim)
         int selecionado = rand() % ((int) ceil(alpha * custoInsercao.size()));
 
         // insere o candidato selecionado na sequencia
-        sequencia.insert(sequencia.begin() + (custoInsercao[selecionado].arestaRemovida + 1), custoInsercao[selecionado].noInserido);
+        s.sequencia.insert(s.sequencia.begin() + (custoInsercao[selecionado].arestaRemovida + 1), custoInsercao[selecionado].noInserido);
         
         // remove o cliente da lista de clientes
         clients.erase(std::find(clients.begin(), clients.end(), custoInsercao[selecionado].noInserido));
+    
     }
     
     std::cout << "Sequencia final: " << std::endl;
-    s.sequencia = sequencia;
-    s.matrizDistancias = matrizAdj;
+
     s.calculaFO();
     s.print();
 

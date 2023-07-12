@@ -38,6 +38,6 @@ Solution::Solution (double** matrizDistancias, std::vector<int> clients): sequen
 
 Solution::Solution (double** matrizDistancias): matrizDistancias(matrizDistancias)
 {
-    this->sequencia = {1, 1};
+    this->sequencia = {};
     this->custoSolucao = 0.0;
 }

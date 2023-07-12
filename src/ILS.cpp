@@ -2,8 +2,12 @@
 #include "Solution.h"
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
+#include <cmath>
+
 
 using namespace ILS;
+
 
 std::vector<InsertionInfo> Solver::calcularCustoInsercao(Solution& s, std::vector<int>& CL)
 {
@@ -40,7 +44,6 @@ Solution Solver::Construction(double** matrizAdj, int* dim)
     {   
         clients[i - 2] = i;
     }
-
     
     int random_index;
     int size_clients = clients.size();
@@ -53,18 +56,38 @@ Solution Solver::Construction(double** matrizAdj, int* dim)
         clients.erase(clients.begin() + random_index--);
     }
 
-    /*
+    std::cout << "Sequencia inicial: " << std::endl;
+    for (int i = 0; i < 2; i++)
+    {
+        std::cout << sequencia[i] << " -> ";
+    }
+    std::cout << sequencia[2] << std::endl;
+    
     while(!clients.empty()) 
     {
         std::vector<InsertionInfo> custoInsercao = calcularCustoInsercao(s, clients);
-        // ordenarEmOrdemCrescente(custoInsercao);
-        // double alpha = (double) rand() / RAND_MAX;
-        // int selecionado = rand() % ((int) ceil(alpha * custoInsercao.size()));
-        // inserirNaSolucao(s, custoInsercao[selecionado].k);
+
+        //  ordena do menor para o maior delta custo (nao crescente)
+        std::sort(custoInsercao.begin(), custoInsercao.end(), [](const InsertionInfo& a, const InsertionInfo& b) {
+            return a.deltaCusto < b.deltaCusto;
+        });
+
+        // escolhe um alpha aleatorio entre 0 e 1
+        // 0 total guloso
+        // 1 total aleatorio
+        double alpha = (double) rand() / RAND_MAX;
+
+        // faz a escolha do candidato selecionado com base no alpha 
+        int selecionado = rand() % ((int) ceil(alpha * custoInsercao.size()));
+
+        // insere o candidato selecionado na sequencia
+        sequencia.insert(sequencia.begin() + (custoInsercao[selecionado].arestaRemovida + 1), custoInsercao[selecionado].noInserido);
+        
+        // remove o cliente da lista de clientes
+        clients.erase(std::find(clients.begin(), clients.end(), custoInsercao[selecionado].noInserido));
     }
-    */
-
-
+    
+    std::cout << "Sequencia final: " << std::endl;
     s.sequencia = sequencia;
     s.matrizDistancias = matrizAdj;
     s.calculaFO();

@@ -26,5 +26,6 @@ int main(int argc, char* argv[]) {
     std::cout << "Apos recalcular FO: " << std::endl;
     s.calculaFO();
     s.print();
+
     return 0;    
 }
